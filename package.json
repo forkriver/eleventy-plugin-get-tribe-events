@@ -1,0 +1,26 @@
+{
+  "name": "11ty-plugin-get-tribe-events",
+  "version": "1.0.0",
+  "description": "An Eleventy plugin to fetch and process events from WordPress sites using Modern Tribe's The Events Calendar plugin",
+  "license": "GPL-3.0-or-later",
+  "author": {
+    "name": "Patrick Johanneson",
+    "email":"pat@patrickjohanneson.com",
+    "url": "https://patrickjohanneson.com"
+  },
+  "keywords": [
+    "eleventy-plugin",
+    "wordpress",
+    "modern-tribe",
+    "the-events-calendar",
+    "events",
+    "event",
+    "calendar"
+  ],
+  "devDependencies": {
+    "@11ty/eleventy": "^3.0.0"
+  },
+  "dependencies": {
+    "@11ty/eleventy-fetch": "^5.0.2"
+  }
+}
