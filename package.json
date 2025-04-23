@@ -5,8 +5,11 @@
   "license": "GPL-3.0-or-later",
   "author": {
     "name": "Patrick Johanneson",
-    "email":"pat@patrickjohanneson.com",
+    "email": "pat@patrickjohanneson.com",
     "url": "https://patrickjohanneson.com"
+  },
+  "scripts": {
+    "start": "npx @11ty/eleventy --serve --watch"
   },
   "keywords": [
     "eleventy-plugin",
@@ -21,6 +24,7 @@
     "@11ty/eleventy": "^3.0.0"
   },
   "dependencies": {
-    "@11ty/eleventy-fetch": "^5.0.2"
+    "@11ty/eleventy-fetch": "^5.0.2",
+    "dotenv": "^16.5.0"
   }
 }
