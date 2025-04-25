@@ -74,7 +74,7 @@ module.exports = function( eleventyConfig, options = {} ) {
 		}
 		events = deDupeEvents( events );
 
-		whatsInThere( events );
+		console.log( events[0] );
 
 		return events;
 	}
