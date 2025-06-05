@@ -1,0 +1,14 @@
+---
+permalink: /events.json
+---
+{
+	"events": [
+	{% for item in collections.events %}
+		{
+			"title": "{{ item.title }}",
+			"url": "{{ item.url }}",
+			"startDate": "{{ item.start_date }}"
+		}{% if not loop.last %},{% endif %}
+	{% endfor %}
+	]
+}
