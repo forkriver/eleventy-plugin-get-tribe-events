@@ -27,13 +27,14 @@ module.exports = function( eleventyConfig, options ) {
 	 * @type {Object} The default values.
 	 */
 	const defaults = {
-		eventPath:         '/wp-json/tribe/events/v1/events',
-		mode:              'production',
-		exportPermalink:   '/events.json',
-		overrideCalendar:  false,
-		calendarPermalink: '/calendar/',
-		calendarTitle:     'Calendar',
-		itemsPerRequest:   50,
+		eventPath:          '/wp-json/tribe/events/v1/events',
+		mode:               'production',
+		exportPermalink:    '/events.json',
+		eventCacheLifetime: '6h',
+		overrideCalendar:   false,
+		calendarPermalink:  '/calendar/',
+		calendarTitle:      'Calendar',
+		itemsPerRequest:    50,
 	}
 
 	// Merges the default values and the `options` override values.
@@ -70,7 +71,7 @@ module.exports = function( eleventyConfig, options ) {
 			}
 
 			let json = await Fetch( url, {
-				duration: "6h",
+				duration: config.eventCacheLifetime,
 				type:     "json",
 			});
 
