@@ -32,56 +32,6 @@ module.exports = function( eleventyConfig, options ) {
 	const ITEMS_PER_REQUEST = 50;
 
 	/**
-	 * Generates the virtual NJK template.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @return {string} The template NJK code.
-	 */
-	function eventsTemplate() {
-		return `
-[
-{% for item in collections.events %}
-	{
-		"id": "{{ item.id }}",
-		"title": "{{ item.title }}",
-		"url": "{{ item.url }}",
-		"start": "{{ item.start_date }}",
-		"end": "{{ item.end_date }}"
-	}{% if not loop.last %},{% endif %}
-{% endfor %}
-]`;
-	}
-
-	function calendarTemplate() {
-		return `<!DOCTYPE html>
-<html>
-<head>
-	<title>${config.calendarTitle}</title>
-	<meta charset='utf-8' />
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
-    <script>
-    	document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          events: '/events.json'
-        });
-        calendar.render();
-      });
-    </script>
-</head>
-
-<body>
-	 <h1>Events</h1>
-	 <div id="calendar"></div>
-
-</body>
-
-</html>`;
-	}
-
-	/**
 	 * Gets a page of events from the REST API.
 	 *
 	 * @since 1.0.0
@@ -126,6 +76,70 @@ module.exports = function( eleventyConfig, options ) {
 		eleventyConfig.addTemplate( 'calendar-template.html', calendarTemplate(), {
 			permalink: config.calendarPermalink
 		} );
+	}
+
+	/**
+	 * Generates the virtual NJK template.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return {string} The template NJK code.
+	 */
+	function eventsTemplate() {
+		return `
+[
+{% for item in collections.events %}
+	{
+		"id": "{{ item.id }}",
+		"title": "{{ item.title }}",
+		"url": "{{ item.url }}",
+		"start": "{{ item.start_date }}",
+		"end": "{{ item.end_date }}"
+	}{% if not loop.last %},{% endif %}
+{% endfor %}
+]`;
+	}
+
+	/**
+	 * Generates the default calendar template.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return {string} The calendar page HTML.
+	 */
+	function calendarTemplate() {
+		return `<!DOCTYPE html>
+<html>
+<head>
+	<title>${config.calendarTitle}</title>
+	<meta charset='utf-8' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+    <script>
+    	document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+		  height: 'calc( 100vh - 4em )',
+		  stickyHeaderDates: true,
+		  headerToolbar: {
+			start: 'title',
+			center: 'today listMonth,dayGridMonth,multiMonthYear',
+			end: 'prev,next'
+		  },
+		  multiMonthMaxColumns: 1,
+          events: '/events.json'
+        });
+        calendar.render();
+      });
+    </script>
+</head>
+
+<body>
+	 <div id="calendar"></div>
+
+</body>
+
+</html>`;
 	}
 
 }
