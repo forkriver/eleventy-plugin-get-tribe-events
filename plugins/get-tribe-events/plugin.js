@@ -18,9 +18,11 @@ module.exports = function( eleventyConfig, options ) {
 	}
 
 	const defaults = {
-		eventPath:       '/wp-json/tribe/events/v1/events/this/is/clearly/wrong',
-		mode:            'production',
-		exportPermalink: '/events.json',
+		eventPath:         '/wp-json/tribe/events/v1/events',
+		mode:              'production',
+		exportPermalink:   '/events.json',
+		calendarPermalink: '/calendar/',
+		calendarTitle:     'Calendar',
 	}
 
 	const config = { ...defaults, ...options };
@@ -48,6 +50,34 @@ module.exports = function( eleventyConfig, options ) {
 	}{% if not loop.last %},{% endif %}
 {% endfor %}
 ]`;
+	}
+
+	function calendarTemplate() {
+		return `<!DOCTYPE html>
+<html>
+<head>
+	<title>${config.calendarTitle}</title>
+	<meta charset='utf-8' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
+    <script>
+    	document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth',
+          events: '/events.json'
+        });
+        calendar.render();
+      });
+    </script>
+</head>
+
+<body>
+	 <h1>Events</h1>
+	 <div id="calendar"></div>
+
+</body>
+
+</html>`;
 	}
 
 	/**
@@ -87,14 +117,9 @@ module.exports = function( eleventyConfig, options ) {
 	}
 	eleventyConfig.addCollection( 'events', async (collectionsApi) => {
 		return getEvents();
-		// let data = await getEvents();
-		// let json = [];
-		// for ( let event of data ) {
-		// 	event.start_date = new Date( event.start_date + ' ' + event.timezone_abbr );
-		// 	event.end_date = new Date( event.end_date + ' ' + event.timezone_abbr );
-		// 	json.push( event );
-		// }
-		// return json;
+	} );
+	eleventyConfig.addTemplate( 'calendar-template.html', calendarTemplate(), {
+		permalink: config.calendarPermalink
 	} );
 	eleventyConfig.addTemplate( 'events-template.njk', eventsTemplate(), {
 		permalink: config.exportPermalink
