@@ -17,6 +17,15 @@ module.exports = function( eleventyConfig, options ) {
 		console.error( "\n" + '!!! Error: "baseURL" option is required.' + "\n" );
 	}
 
+	/**
+	 * Default values for the plugin.
+	 *
+	 * Can be overridden in the `options` object passed by Eleventy.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @type {Object} The default values.
+	 */
 	const defaults = {
 		eventPath:         '/wp-json/tribe/events/v1/events',
 		mode:              'production',
@@ -24,12 +33,13 @@ module.exports = function( eleventyConfig, options ) {
 		overrideCalendar:  false,
 		calendarPermalink: '/calendar/',
 		calendarTitle:     'Calendar',
+		itemsPerRequest:   50,
 	}
 
+	// Merges the default values and the `options` override values.
 	const config = { ...defaults, ...options };
 
-	const EVENT_API         = `${config.baseURL}${config.eventPath}`;
-	const ITEMS_PER_REQUEST = 50;
+	const EVENT_API_URL = `${config.baseURL}${config.eventPath}`;
 
 	/**
 	 * Gets a page of events from the REST API.
@@ -39,36 +49,51 @@ module.exports = function( eleventyConfig, options ) {
 	 * @param  {int} page The page to get; defaults to 1.
 	 * @return {object}   Total, Full count, and Events.
 	 */ 
-	async function getEvents( page = 1 ) {
+	async function getEvents( nextURL = '' ) {
 		try {
-			let url = EVENT_API;
-			if ( 1 < page ) {
-				url += `?page=${page}`;
+			let url;
+			if ( 0 === nextURL.length ) {
+				url = EVENT_API_URL;
+				const params = {
+					per_page: config.itemsPerRequest,
+				};
+				let requestString = '';
+				for ( var key in params ) {
+					requestString += key + '=' + params[ key ] + '&';
+				}
+
+				if ( requestString.length > 0 ) {
+					url += '?' + requestString;
+				}
+			} else {
+				url = nextURL;
 			}
-			const params = {
-				params: {
-					page:     page,
-					per_page: ITEMS_PER_REQUEST,
-					order:    "desc",
-				},
-			};
 
 			let json = await Fetch( url, {
 				duration: "6h",
 				type:     "json",
 			});
 
-			// console.log( json );
-
-			return json.events;
+			return json;
 
 		} catch( e ) {
 			console.error( e );
 		}
 	}
+
+	// Builds the 'events' collection.
 	eleventyConfig.addCollection( 'events', async (collectionsApi) => {
-		return getEvents();
+		let allEvents = [];
+		let events = await getEvents();
+		let i = 1;
+		allEvents.push( ...events.events );
+		while ( events.next_rest_url ) {
+			events = await getEvents( events.next_rest_url );
+			allEvents.push( ...events.events );
+		}
+		return allEvents;
 	} );
+
 	eleventyConfig.addTemplate( 'events-template.njk', eventsTemplate(), {
 		permalink: config.exportPermalink
 	} );
@@ -86,9 +111,8 @@ module.exports = function( eleventyConfig, options ) {
 	 * @return {string} The template NJK code.
 	 */
 	function eventsTemplate() {
-		return `
-[
-{% for item in collections.events %}
+		return `[
+{%- for item in collections.events %}
 	{
 		"id": "{{ item.id }}",
 		"title": "{{ item.title }}",
@@ -96,7 +120,7 @@ module.exports = function( eleventyConfig, options ) {
 		"start": "{{ item.start_date }}",
 		"end": "{{ item.end_date }}"
 	}{% if not loop.last %},{% endif %}
-{% endfor %}
+{% endfor -%}
 ]`;
 	}
 
@@ -119,14 +143,15 @@ module.exports = function( eleventyConfig, options ) {
         var calendarEl = document.getElementById('calendar');
         var calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'dayGridMonth',
-		  height: 'calc( 100vh - 4em )',
+		  // height: 'calc( 100vh - 4em )',
+		  height: 'auto',
 		  stickyHeaderDates: true,
 		  headerToolbar: {
 			start: 'title',
-			center: 'today listMonth,dayGridMonth,multiMonthYear',
-			end: 'prev,next'
+			center: '',
+			end: 'today listMonth,dayGridMonth,multiMonthYear prev,next'
 		  },
-		  multiMonthMaxColumns: 1,
+		  multiMonthMaxColumns: 3,
           events: '/events.json'
         });
         calendar.render();
