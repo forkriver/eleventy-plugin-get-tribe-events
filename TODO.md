@@ -3,10 +3,11 @@
 ## Core functionality
 
 - [ ] Get all events in pages of {n} events
+- [ ] Preserve past events in a JSON file
 - [ ] Get venues for the events
 - [ ] Get organizers for the events
-- [ ] Expose all event data to Eleventy as a collection
+- [x] Expose all event data to Eleventy as a collection
 
 ## Stretch goals
 
-- [ ] Add events to fullcalendar.io
+- [x] Add events to fullcalendar.io
