@@ -37,19 +37,17 @@ module.exports = function( eleventyConfig, options ) {
 	 */
 	function eventsTemplate() {
 		return `
-{
-	"events": [
-	{% for item in collections.events %}
-		{
-			"id": "{{ item.id }}",
-			"title": "{{ item.title }}",
-			"url": "{{ item.url }}",
-			"startStr": "{{ item.start_date }}.000",
-			"endStr": "{{ item.end_date }}.000"
-		}{% if not loop.last %},{% endif %}
-	{% endfor %}
-	]
-}`;
+[
+{% for item in collections.events %}
+	{
+		"id": "{{ item.id }}",
+		"title": "{{ item.title }}",
+		"url": "{{ item.url }}",
+		"start": "{{ item.start_date }}",
+		"end": "{{ item.end_date }}"
+	}{% if not loop.last %},{% endif %}
+{% endfor %}
+]`;
 	}
 
 	/**
@@ -89,6 +87,14 @@ module.exports = function( eleventyConfig, options ) {
 	}
 	eleventyConfig.addCollection( 'events', async (collectionsApi) => {
 		return getEvents();
+		// let data = await getEvents();
+		// let json = [];
+		// for ( let event of data ) {
+		// 	event.start_date = new Date( event.start_date + ' ' + event.timezone_abbr );
+		// 	event.end_date = new Date( event.end_date + ' ' + event.timezone_abbr );
+		// 	json.push( event );
+		// }
+		// return json;
 	} );
 	eleventyConfig.addTemplate( 'events-template.njk', eventsTemplate(), {
 		permalink: config.exportPermalink
