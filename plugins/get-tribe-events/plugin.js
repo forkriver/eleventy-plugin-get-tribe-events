@@ -21,6 +21,7 @@ module.exports = function( eleventyConfig, options ) {
 		eventPath:         '/wp-json/tribe/events/v1/events',
 		mode:              'production',
 		exportPermalink:   '/events.json',
+		overrideCalendar:  false,
 		calendarPermalink: '/calendar/',
 		calendarTitle:     'Calendar',
 	}
@@ -118,11 +119,13 @@ module.exports = function( eleventyConfig, options ) {
 	eleventyConfig.addCollection( 'events', async (collectionsApi) => {
 		return getEvents();
 	} );
-	eleventyConfig.addTemplate( 'calendar-template.html', calendarTemplate(), {
-		permalink: config.calendarPermalink
-	} );
 	eleventyConfig.addTemplate( 'events-template.njk', eventsTemplate(), {
 		permalink: config.exportPermalink
 	} );
+	if ( ! config.overrideCalendar ) {
+		eleventyConfig.addTemplate( 'calendar-template.html', calendarTemplate(), {
+			permalink: config.calendarPermalink
+		} );
+	}
 
 }
